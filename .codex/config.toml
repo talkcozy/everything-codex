@@ -1,0 +1,117 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# Everything Codex — OpenAI Codex 优化配置
+#
+# 本配置文件专为 OpenAI Codex CLI 和 App 设计
+# 受 ECC (Everything Claude Code) 项目启发
+#
+# 使用说明:
+# - 复制此文件到 ~/.codex/config.toml 作为全局配置
+# - 或保留在项目根目录作为项目本地配置
+#
+# 官方文档:
+# - https://developers.openai.com/codex/config-reference
+# - https://developers.openai.com/codex/multi-agent
+
+# 模型选择
+# 保留默认设置以使用 Codex 内置默认模型
+# 仅在需要特定模型时取消注释并修改
+# model = "gpt-5.4"
+# model_provider = "openai"
+
+# 运行时设置
+approval_policy = "on-request"      # 请求时批准: on-request | never
+sandbox_mode = "workspace-write"    # 沙箱模式: read-only | workspace-write | network-enable
+web_search = "live"                 # 网络搜索: live | cached | disabled
+
+# 持久化指令
+# 这些指令会附加到每个提示中
+persistent_instructions = """
+遵循项目 AGENTS.md 中的指导原则。
+使用可用的 MCP 服务器来辅助完成任务。
+遵循最佳安全实践，不要硬编码敏感信息。
+在修改代码前，先理解现有代码结构和意图。
+"""
+
+# MCP 服务器配置
+# 保持默认项目精简配置
+
+[mcp_servers.github]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+startup_timeout_sec = 30
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+startup_timeout_sec = 30
+
+[mcp_servers.memory]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-memory"]
+startup_timeout_sec = 30
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest", "--extension"]
+startup_timeout_sec = 30
+
+[mcp_servers.sequential-thinking]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+startup_timeout_sec = 30
+
+# 可选 MCP 服务器（根据需要取消注释）
+# [mcp_servers.supabase]
+# command = "npx"
+# args = ["-y", "supabase-mcp-server@latest", "--read-only"]
+#
+# [mcp_servers.firecrawl]
+# command = "npx"
+# args = ["-y", "firecrawl-mcp"]
+#
+# [mcp_servers.exa]
+# url = "https://mcp.exa.ai/mcp"
+
+[features]
+# 多智能体协作
+multi_agent = true
+
+# 配置文件
+[profiles]
+
+[profiles.strict]
+approval_policy = "on-request"
+sandbox_mode = "read-only"
+web_search = "cached"
+
+[profiles.yolo]
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+web_search = "live"
+
+[profiles.research]
+approval_policy = "on-request"
+sandbox_mode = "network-enable"
+web_search = "live"
+
+# 多智能体角色配置
+[agents]
+max_threads = 6
+max_depth = 2
+
+[agents.explorer]
+description = "只读代码库探索者，用于在提出更改前收集证据"
+config_file = ".codex/agents/explorer.toml"
+
+[agents.reviewer]
+description = "专注于正确性、安全性和缺失测试的 PR 审查者"
+config_file = ".codex/agents/reviewer.toml"
+
+[agents.architect]
+description = "负责高层系统设计和技术决策的架构师"
+config_file = ".codex/agents/architect.toml"
+
+[agents.docs]
+description = "验证 API、框架行为和发布说明的文档专家"
+config_file = ".codex/agents/docs.toml"
