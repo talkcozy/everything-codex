@@ -97,6 +97,31 @@ everything-codex/
 | `reviewer` | Code review & security | PR reviews, audits |
 | `architect` | High-level design | System design, refactoring |
 | `docs` | Documentation specialist | API docs, guides |
+| `coder` | Code implementation | Feature development |
+| `debugger` | Problem diagnosis | Bug fixing, troubleshooting |
+| `learner` | Pattern extraction | Knowledge documentation |
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/code-review` | Comprehensive code and security review |
+| `/security-scan` | OWASP Top 10 security audit |
+| `/refactor` | Systematic code improvement |
+| `/debug` | Systematic problem diagnosis |
+
+## Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `tdd-workflow` | Test-driven development workflow |
+| `security-review` | Security audit checklist |
+| `code-exploration` | Codebase analysis methodology |
+| `api-design` | RESTful/GraphQL API design |
+| `testing-strategy` | Test planning and execution |
+| `documentation` | Technical writing guide |
+| `performance-optimization` | Performance tuning |
+| `git-workflow` | Git best practices |
 
 ## Usage Examples
 

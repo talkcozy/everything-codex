@@ -97,6 +97,31 @@ everything-codex/
 | `reviewer` | 代码审查与安全检查 | PR 审查、审计 |
 | `architect` | 高层设计 | 系统设计、重构 |
 | `docs` | 文档专家 | API 文档、指南 |
+| `coder` | 代码实现 | 功能开发 |
+| `debugger` | 问题诊断 | Bug 修复、故障排查 |
+| `learner` | 模式提取 | 知识文档化 |
+
+## 可用命令
+
+| 命令 | 描述 |
+|------|------|
+| `/code-review` | 全面的代码和安全审查 |
+| `/security-scan` | OWASP Top 10 安全审计 |
+| `/refactor` | 系统化代码改进 |
+| `/debug` | 系统化问题诊断 |
+
+## 可用技能
+
+| 技能 | 描述 |
+|------|------|
+| `tdd-workflow` | 测试驱动开发工作流 |
+| `security-review` | 安全审计检查清单 |
+| `code-exploration` | 代码库分析方法 |
+| `api-design` | RESTful/GraphQL API 设计 |
+| `testing-strategy` | 测试规划和执行 |
+| `documentation` | 技术写作指南 |
+| `performance-optimization` | 性能调优 |
+| `git-workflow` | Git 最佳实践 |
 
 ## 使用示例
 
