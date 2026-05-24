@@ -1,76 +1,92 @@
 ---
-description: 安全扫描 — 检查代码中的安全漏洞
-description-zh: Security scan — check for security vulnerabilities in code
+description: Run AgentShield against agent, hook, MCP, permission, and secret surfaces.
+agent: everything-claude-code:security-reviewer
+subtask: true
 ---
 
-# 安全扫描 / Security Scan
+# Security Scan Command
 
-执行全面的安全审查。
+Run AgentShield against the current project or a target path, then turn the findings into a prioritized remediation plan.
 
-## 使用方式
+## Usage
+
+`/security-scan [path] [--format text|json|markdown|html] [--min-severity low|medium|high|critical] [--fix]`
+
+- `path` (optional): defaults to the current project. Use a `.claude/` path, a repo root, or a checked-in template directory.
+- `--format`: output format. Use `json` for CI, `markdown` for handoffs, and `html` for standalone review reports.
+- `--min-severity`: filters lower-priority findings.
+- `--fix`: applies only AgentShield fixes explicitly marked as safe and auto-fixable.
+
+## Deterministic Engine
+
+Prefer the packaged scanner:
 
 ```bash
-# 扫描整个项目
-codex /security-scan
-
-# 扫描特定文件
-codex /security-scan src/auth.js
-
-# 扫描特定目录
-codex /security-scan src/
+npx ecc-agentshield scan --path "${TARGET_PATH:-.}" --format text
 ```
 
-## 扫描范围
+For local AgentShield development, run from the AgentShield checkout:
 
-### OWASP Top 10
-1. **注入攻击** - SQL、NoSQL、OS 命令
-2. **失效的访问控制** - 权限绕过
-3. **敏感数据暴露** - 加密、传输
-4. **XML 外部实体** - XXE
-5. **失效的身份认证** - 会话管理
-6. **安全配置错误** - 默认配置
-7. **跨站脚本** - XSS
-8. **不安全的反序列化** - 对象注入
-9. **使用已知漏洞组件** - 依赖安全
-10. **不足的日志监控** - 审计追踪
-
-### 代码安全
-- 硬编码密钥和令牌
-- 不安全的随机数
-- 不安全的文件操作
-- 危险函数使用
-- 敏感信息日志
-
-### 配置安全
-- 环境变量检查
-- 配置文件安全
-- 依赖版本检查
-- 密钥管理
-
-## 输出格式
-
-```markdown
-## 安全扫描报告
-
-### 执行摘要
-- **扫描时间**: [时间]
-- **扫描范围**: [范围]
-- **风险等级**: 🔴 高 / 🟡 中 / 🟢 低
-
-### 🔴 严重漏洞
-| 漏洞 | 位置 | 风险 | CWE |
-|------|------|------|-----|
-| [名称] | `文件:行号` | [描述] | [编号] |
-
-### 🟡 中等风险
-...
-
-### 🛡️ 修复建议
-1. [具体修复步骤]
-2. [预防措施]
-
-### 合规检查
-- [ ] OWASP Top 10
-- [ ] CWE/SANS Top 25
-- [ ] 行业特定要求
+```bash
+npm run scan -- --path "${TARGET_PATH:-.}" --format text
 ```
+
+Do not invent findings. Use AgentShield output as the source of truth and separate scanner facts from follow-up judgment.
+
+## Review Checklist
+
+1. Identify active runtime findings first:
+   - hardcoded secrets
+   - broad permissions
+   - executable hooks
+   - MCP servers with shell, filesystem, remote transport, or unpinned `npx`
+   - agent prompts that handle untrusted content without defenses
+2. Separate lower-confidence inventory:
+   - docs examples
+   - template examples
+   - plugin manifests
+   - project-local optional settings
+3. For each critical or high finding, return:
+   - file path
+   - severity
+   - runtime confidence
+   - why it matters
+   - exact remediation
+   - whether it is safe to auto-fix
+4. If `--fix` is requested, state the planned edits before applying fixes.
+5. Re-run the scan after fixes and report the before/after score.
+
+## Output Contract
+
+Return:
+
+1. Security grade and score.
+2. Counts by severity and runtime confidence.
+3. Critical/high findings with exact paths.
+4. Lower-confidence findings grouped separately.
+5. A remediation order.
+6. Commands run and whether the scan was local, CI, or npx-backed.
+
+## CI Pattern
+
+Use AgentShield in GitHub Actions for enforced gates:
+
+```yaml
+- uses: affaan-m/agentshield@v1
+  with:
+    path: "."
+    min-severity: "medium"
+    fail-on-findings: true
+```
+
+## Links
+
+- Skill: `skills/security-scan/SKILL.md`
+- Agent: `agents/security-reviewer.md`
+- Scanner: <https://github.com/affaan-m/agentshield>
+
+## Arguments
+
+$ARGUMENTS:
+- optional target path
+- optional AgentShield flags
